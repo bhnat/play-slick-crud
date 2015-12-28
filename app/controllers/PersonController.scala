@@ -6,7 +6,7 @@ import play.api.i18n._
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
-import play.api.libs.json.Json
+import play.api.libs.json._
 import models._
 import dal._
 
@@ -62,10 +62,50 @@ class PersonController @Inject() (repo: PersonRepository, val messagesApi: Messa
    * A REST endpoint that gets all the people as JSON.
    */
   def getPersons = Action.async {
-  	repo.list().map { people =>
+    repo.list().map { people =>
       Ok(Json.toJson(people))
     }
   }
+
+  def getPerson(id: Long) = Action.async {
+    repo.list(id).map { people =>
+      Ok(Json.toJson(people))
+    }
+  }
+
+  /**
+   * A REST endpoint that creates a new person from JSON.
+   */
+  def create = Action.async(BodyParsers.parse.json) { request => 
+    val person = request.body.validate[Person]
+    person.fold(
+      errors => Future(BadRequest(Json.obj(
+          "status" -> "Parsing person failed",
+          "error" -> JsError.toJson(errors)))),
+      person => 
+        repo.create(person.name, person.age).map { p =>
+            Ok(Json.obj("status" -> "Success", "id" -> p.id))
+        }
+    )
+  }
+
+  def update(id: Long) = Action.async(BodyParsers.parse.json) { request =>
+    val person = request.body.validate[Person]
+    person.fold(
+      errors => Future(BadRequest(Json.obj(
+          "status" -> "Parsing person failed",
+          "error" -> JsError.toJson(errors)))),
+      person => 
+        repo.update(id, person).map { p =>
+            Ok(Json.obj("status" -> "Success"))
+        }
+    )
+  }
+
+  def delete(id: Long) = Action.async {
+    repo.delete(id).map { p => Ok(Json.obj("status" -> "Success")) }
+  }
+
 }
 
 /**

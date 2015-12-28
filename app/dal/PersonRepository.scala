@@ -74,7 +74,19 @@ class PersonRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impl
   /**
    * List all the people in the database.
    */
+  def list(id:Long): Future[Seq[Person]] = db.run {
+    people.filter(_.id === id).result
+  }
+
   def list(): Future[Seq[Person]] = db.run {
     people.result
+  }
+
+  def delete(id:Long) = db.run {
+    people.filter(_.id === id).delete
+  }
+
+  def update(id: Long, person: Person) = db.run {
+    people.filter(_.id === id).update(person)
   }
 }
