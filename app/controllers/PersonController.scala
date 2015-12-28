@@ -76,7 +76,7 @@ class PersonController @Inject() (repo: PersonRepository, val messagesApi: Messa
   /**
    * A REST endpoint that creates a new person from JSON.
    */
-  def create = Action.async(BodyParsers.parse.json) { request => 
+  def create = LoggingAction.async(BodyParsers.parse.json) { request => 
     val person = request.body.validate[Person]
     person.fold(
       errors => Future(BadRequest(Json.obj(
