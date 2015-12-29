@@ -61,7 +61,8 @@ class PersonController @Inject() (repo: PersonRepository, val messagesApi: Messa
   /**
    * A REST endpoint that gets all the people as JSON.
    */
-  def getPersons = Action.async {
+  def getPersons = UserAction.async { userRequest => 
+    Logger.info("getPersons" + userRequest.username)
     repo.list().map { people =>
       Ok(Json.toJson(people))
     }

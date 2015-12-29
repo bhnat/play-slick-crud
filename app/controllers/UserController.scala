@@ -20,13 +20,14 @@ class UserController @Inject() (repo: UserRepository, val messagesApi: MessagesA
   /**
    * A REST endpoint that gets all the users as JSON.
    */
-  def getAll = Action.async {
+  def getAll = (UserAction andThen AdminCheckAction).async { userRequest => 
+    Logger.info("get Users " + userRequest.username)
     repo.list().map { users =>
       Ok(Json.toJson(users))
     }
   }
 
-  def getOnly(id: Long) = Action.async {
+  def getOnly(id: Long) = LoggingAction.async {
     repo.list(id).map { user =>
       Ok(Json.toJson(user))
     }
