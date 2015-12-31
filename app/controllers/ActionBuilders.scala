@@ -28,7 +28,7 @@ object AdminCheckAction extends ActionFilter[UserRequest] {
   def filter[A](request: UserRequest[A]) = Future.successful {
     var sessionkey = request.headers.get("sessionkey").getOrElse("")
     if (sessionkey != "1234")
-      Some(Results.Forbidden)
+      Some(Results.Forbidden("Blah!"))
     else
       None
   }
